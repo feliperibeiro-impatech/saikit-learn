@@ -1,0 +1,25 @@
+[build-system]
+requires = ["flit_core >=3.11,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "saikit-learn"
+authors = [
+    {name = "André Oliveira", email = "al.andre.oliveira@impatech.edu.br"},
+    {name = "Davi Pestana", email = "al.davi.campos@impatech.edu.br"},
+    {name = "Felipe Ribeiro", email = "al.felipe.mendonca@impatech.edu.br"},
+    {name = "Gabriel Krauss", email = "al.gabriel.dias@impatech.edu.br"},
+    {name = "Huann Vicente", email = "al.huann.silva@impatech.edu.br"},
+    {name = "Lucas Corazza", email = "al.lucas.corazza@impatech.edu.br"},
+    {name = "Nicole Freire", email = "al.nicole.freire@impatech.edu.br"}
+]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+dynamic = ["version", "description"]
+dependencies = ["sympy", "matplotlib", "numpy"]
+requires-python = ">=3.8"
+
+[project.urls]
+Home = "https://github.com/feliperibeiro-impatech/saikit-learn.git"
+
