@@ -20,4 +20,7 @@ f_hat = model.predict(x_n)
 
 # definir testes...
 
+def teste1():
+    assert 1 == 1
+
 
