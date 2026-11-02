@@ -1,6 +1,5 @@
-from minimos_quadrados import MQO
+from saikit_learn.regressao.minimos_quadrados import MQO
 import numpy as np
-import matplotlib.pyplot as plt
 
 n, p = 100, 1
 x = np.random.random((n, p))
@@ -19,13 +18,6 @@ print(model.beta)
 x_n = np.linspace(0, 1, 200).reshape(-1, 1)
 f_hat = model.predict(x_n)
 
-plt.scatter(x, y, alpha = 0.6, label = 'data')
-plt.plot(x_n, f_hat, label = 'prediction', color = 'red', linestyle = '-')
-plt.plot(x_n, f(x_n), label = 'real function', color = 'black', linestyle = '--')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.grid(True)
-plt.legend()
-plt.show()
+# definir testes...
 
 
