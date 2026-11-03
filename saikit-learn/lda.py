@@ -12,3 +12,31 @@ class LDA(_BaseDiscriminant):
             scatter += centro.T @ centro
 
         self._covariance = scatter / (n_samples - n_classes)
+
+    def predict(self, X):
+        if self._covariance is None:
+            raise RuntimeError("Chame fit antes de predict.")
+
+        X = np.asarray(X, dtype=np.float64)
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
+        if X.ndim != 2 or X.shape[1] != self._n_features:
+            raise ValueError(f"X deve ter shape (n_samples, {self._n_features}).")
+        
+        cov_inv = np.linalg.inv(self._covariance)
+        n_classes = len(self._classes)
+
+        predictions = []
+
+        for x in X:
+            score = np.zeros(n_classes)
+
+            for k in range(n_classes):
+                m = self._means[k]
+                p = self._priors[k]
+                score[k] = x @ cov_inv @ m - 0.5 * m @ cov_inv @ m + np.log(p)
+
+            predictions.append(self._classes[np.argmax(score)])
+
+        return np.array(predictions)
+
