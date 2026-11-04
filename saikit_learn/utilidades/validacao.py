@@ -19,7 +19,7 @@ def verify_array(X, name='X'):
             f'{name} is empty; shape {X.shape}.'
         )
 
-    if not np.all(np.isinfinite(X)):
+    if not np.all(np.isfinite(X)):
         raise ValueError(
             f'{name} contains NaN or inf.'
         )
