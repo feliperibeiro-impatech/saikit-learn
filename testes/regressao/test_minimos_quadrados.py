@@ -37,3 +37,9 @@ def test_normal_equations(noise_data):
     np.testing.assert_allclose(model.intercept_, beta_ref[0], atol=1e-8)
     np.testing.assert_allclose(model.coef_, beta_ref[1:], atol=1e-8)
 
+def test_orthogonal_residual(noise_data):
+    X, y = noise_data
+    model = OLS().fit(X, y)
+    residual = y - model.predict(X)
+    np.testing.assert_allclose(residual.sum(), 0.0, atol=1e-8)
+    np.testing.assert_allclose(X.T @ residual, 0.0, atol=1e-8)
