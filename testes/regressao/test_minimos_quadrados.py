@@ -1,4 +1,5 @@
 from saikit_learn.regressao.minimos_quadrados import OLS
+from saikit_learn.utilidades.validacao import NotFittedError
 import numpy as np
 import pytest
 
@@ -94,3 +95,11 @@ def test_more_features_than_sample():
     y = rng.normal(size=5)
     model = OLS().fit(X, y)
     np.testing.assert_allclose(model.predict(X), y, atol=1e-8)
+
+# Testes de erros
+
+def test_predict_before_fit(data):
+    X, y = data
+    with pytest.raises(NotFittedError):
+        OLS().predict(X)
+
