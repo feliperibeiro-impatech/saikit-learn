@@ -35,7 +35,7 @@ class OLS:
         X, y =  verify_X_y(x, y)
         X = self._design(X)
 
-        beta = np.linalg.solve(X.T @ X, X.T @ y)
+        beta = np.linalg.lstsq(X, y, rcond=None)[0]
 
         self.intercept_ = beta[0] if self.intercepto else 0.0
         self.coef_ = beta[1:] if self.intercepto else beta
