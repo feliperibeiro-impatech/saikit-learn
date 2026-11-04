@@ -56,7 +56,7 @@ class OLS:
 
         '''
         if self._fitted:
-            return X @ self.coef_ + self.intecept_
+            return X @ self.coef_ + self.intercept_
 
         else:
             raise NotFittedError(
