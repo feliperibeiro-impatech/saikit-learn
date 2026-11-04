@@ -49,3 +49,12 @@ def test_correct_coeficients_with_noise(noise_data):
     model = OLS().fit(X, y)
     np.testing.assert_allclose(model.intercept_, intercepto, atol=.5)
     np.testing.assert_allclose(model.coef_, coef, atol=.5)
+
+def test_predict_correctly(data):
+    X, y = data
+    model = OLS().fit(X, y)
+    rng = np.random.default_rng(1)
+    X_new = rng.normal(size=(100, 3))
+    y_new = X_new @ coef + intercepto
+    error = y_new - model.predict(X_new)
+    np.testing.assert_allclose(error.sum(), 0.0, atol=1e-8)
