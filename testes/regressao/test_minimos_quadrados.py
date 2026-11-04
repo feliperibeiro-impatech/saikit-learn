@@ -129,3 +129,8 @@ def test_fit_return_self(data):
     X, y = data
     model  = OLS()
     assert model.fit(X, y) is model
+
+def test_ideal_shape(data):
+    X, y = data
+    model = OLS().fit(X, y)
+    assert model.predict(X).shape == (50,)
