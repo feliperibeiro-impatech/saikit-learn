@@ -87,3 +87,10 @@ def test_colinear_columns(data):
     X_rd = np.column_stack([X, X[:, 0]])
     model = OLS().fit(X_rd, y)
     np.testing.assert_allclose(model.predict(X_rd), y, atol=1e-8)
+
+def test_more_features_than_sample():
+    rng = np.random.default_rng(1)
+    X = rng.normal(size=(5, 10))
+    y = rng.normal(size=5)
+    model = OLS().fit(X, y)
+    np.testing.assert_allclose(model.predict(X), y, atol=1e-8)
