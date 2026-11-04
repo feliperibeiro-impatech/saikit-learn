@@ -29,5 +29,11 @@ def test_recovers_coeficients_whithout_noise(data):
     np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
     np.testing.assert_allclose(model.intercept_, intercepto, atol=1e-8)
 
-
+def test_normal_equations(noise_data):
+    X, y = noise_data
+    A = np.column_stack([np.ones(X.shape[0]), X])
+    beta_ref = np.linalg.solve(A.T @ A, A.T @ y)
+    model = OLS().fit(X, y)
+    np.testing.assert_allclose(model.intercept_, beta_ref[0], atol=1e-8)
+    np.testing.assert_allclose(model.coef_, beta_ref[1:], atol=1e-8)
 
