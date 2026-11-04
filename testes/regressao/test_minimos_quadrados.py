@@ -43,3 +43,9 @@ def test_orthogonal_residual(noise_data):
     residual = y - model.predict(X)
     np.testing.assert_allclose(residual.sum(), 0.0, atol=1e-8)
     np.testing.assert_allclose(X.T @ residual, 0.0, atol=1e-8)
+
+def test_correct_coeficients_with_noise(noise_data):
+    X, y = noise_data
+    model = OLS().fit(X, y)
+    np.testing.assert_allclose(model.intercept_, intercepto, atol=.5)
+    np.testing.assert_allclose(model.coef_, coef, atol=.5)
