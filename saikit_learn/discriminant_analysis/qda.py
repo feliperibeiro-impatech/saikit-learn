@@ -1,4 +1,4 @@
-from discriminant_analysis import _BaseDiscriminant
+from saikit_learn.discriminant_analysis.base import _BaseDiscriminant
 
 class QDA(_BaseDiscriminant):
     def _fit_covariance(self, X, Y):

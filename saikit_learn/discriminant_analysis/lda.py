@@ -1,4 +1,4 @@
-from discriminant_analysis import _BaseDiscriminant
+from saikit_learn.discriminant_analysis.base import _BaseDiscriminant
 import numpy as np
 
 class LDA(_BaseDiscriminant):
