@@ -108,3 +108,19 @@ def test_attibutes_do_not_exist_yet():
     assert not hasattr(model, 'coef')
     assert not hasattr(model, 'intercept_')
 
+@pytest.mark.parametrize(
+    'X, y',
+    [
+        (np.ones(15), np.ones(15)),
+        (np.array([[1.0, np.nan], [2.0, 3.0]]), np.ones(2)),
+        (np.array([[1.0, np.inf], [2.0, 3.0]]), np.ones(2)),
+        (np.ones((5, 2)), np.ones(4)),
+        (np.ones((3, 2)), np.array([1, np.nan, 1.0])),
+        (np.ones((5, 2)), np.ones((5, 2))),
+        (np.empty((0, 2)), np.empty(0))
+    ]
+)
+
+def test_invalid_entries(X, y):
+    with pytest.raises(ValueError):
+        OLS().fit(X, y)
