@@ -124,3 +124,8 @@ def test_attibutes_do_not_exist_yet():
 def test_invalid_entries(X, y):
     with pytest.raises(ValueError):
         OLS().fit(X, y)
+
+def test_fit_return_self(data):
+    X, y = data
+    model  = OLS()
+    assert model.fit(X, y) is model
