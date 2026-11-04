@@ -49,3 +49,6 @@ def verify_X_y(X, y):
         )
 
     return X, y
+
+class NotFittedError(ValueError, AttributeError):
+    '''Raised when use a model (predict) before call fit'''
