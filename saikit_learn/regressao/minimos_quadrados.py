@@ -1,4 +1,4 @@
-from saikit_learn.utilidades.validacao import verify_X_y
+from saikit_learn.utilidades.validacao import verify_X_y, NotFittedError
 import numpy as np
 
 class OLS:
@@ -7,14 +7,16 @@ class OLS:
     Parameters:
         intercepto: bool, default=True
 
-    Attributes
-    coef
+    Attributes:
+        coef_ : np.ndarray shape (n_features)
+        intercept_ : float
+        _fitted : bool
     '''
     def __init__(self, intercepto:bool = True):
         self.intercepto = intercepto
         self._fitted = False
 
-    def _design(self, x:np.ndarray):
+    def _design(self, x:np.ndarray) -> np.ndarray:
         if self.intercepto:
             X = np.column_stack([np.ones(x.shape[0]), x])
             return X
@@ -40,7 +42,7 @@ class OLS:
         self._fitted = True
         return self
 
-    def predict(self, X:np.ndarray):
+    def predict(self, X:np.ndarray) -> np.ndarray:
         '''Predict y for new sample.
 
         Parameters:
@@ -50,13 +52,14 @@ class OLS:
             ndarray shape (n_sample)
 
         Raise:
+            NotFittedError
 
         '''
         if self._fitted:
             return X @ self.coef_ + self.intecept_
 
         else:
-            raise ValueError(
+            raise NotFittedError(
                 f'{self.__name__} was not fitted yet'
             )
 
