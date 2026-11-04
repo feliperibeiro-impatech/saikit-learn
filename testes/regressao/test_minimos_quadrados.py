@@ -82,3 +82,8 @@ def test_sum_constant_to_y(data):
     np.testing.assert_allclose(model.coef_, base.coef_, atol=1e-8)
     np.testing.assert_allclose(model.intercept_, base.intercept_ - 4.0, atol=1e-8)
 
+def test_colinear_columns(data):
+    X, y = data
+    X_rd = np.column_stack([X, X[:, 0]])
+    model = OLS().fit(X_rd, y)
+    np.testing.assert_allclose(model.predict(X_rd), y, atol=1e-8)
