@@ -37,7 +37,7 @@ class KNN:
 
             k_neighbors = sorted_labels[:self._k]
 
-            #Escolhe o primero rótulo por ser a dos pontos mais próximos
+            # Escolhe o primero rótulo por ser a dos pontos mais próximos
             label, first_pos, count = np.unique(k_neighbors, return_index=True, return_counts=True)
             candidates = count == count.max()
             predicted_labels.append(label[np.argmin(first_pos[candidates])])
