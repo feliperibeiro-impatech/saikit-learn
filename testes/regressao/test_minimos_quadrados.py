@@ -67,3 +67,10 @@ def test_predict_correctly_with_noise(noise_data):
     y_new = X_new @ coef + interception + rng.normal(scale=0.1, size = 1000)
     error = y_new - model.predict(X_new)
     np.testing.assert_allclose(error.sum() / 1000, 0.0, atol=1e-2)
+
+def test_without_interception():
+    rng = np.random.default_rng(1)
+    X = rng.normal(size = (50, 3))
+    y = X @ coef
+    model = OLS(intercepto=False).fit(X, y)
+    np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
