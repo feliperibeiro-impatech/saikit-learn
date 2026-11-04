@@ -1,52 +1,45 @@
-from collections import Counter
-import pandas as pd
 import numpy as np
 
 class KNN:
-    def __init__(self, k: int, label: str, data: pd.DataFrame, p: int = 2) -> None:
+    def __init__(self, k: int, p: int = 2) -> None:
+        if self._p not in [1,2]:
+            raise ValueError("p deve ser 1 ou 2.")
         self._k = k
         self._p = p
-        self._label = label
-        self._data = data
-        if self._p not in [1,2]:
-            raise ValueError
+        self._X = None
+        self._Y = None
 
-    def _get_distances_with_labels(self, point:pd.Series) -> pd.DataFrame:
-        label = self._label
-        data = self._data
-        features = data[data.columns.drop(label)]
+    def fit(self, X, Y) -> None:
+        X = np.asarray(X, dtype=np.float64)
+        Y = np.asarray(Y, dtype=np.float64)
+        
+        if len(X) != len(Y):
+            raise ValueError("X e Y devem ser de mesmo tamanho") 
 
-        point_features = point[features.column]
+        return self
 
-        diff = np.abs(features - point_features)
+    def _get_distances_with_labels(self, x: np.array) -> np.array:
+        
+        diff = np.abs(self._X - x)
         distances = np.sum(diff ** self._p, axis=1) ** (1 / self._p)
 
-        result = pd.DataFrame({"distances": distances, label: data[label]}).sort_values(by="distances")
-        return result
+        result = np.argsort(distances, kind='stable')
+        
+        return self._Y[result]
 
-    def classify(self, input: pd.DataFrame) -> pd.DataFrame:    
-        label = self._label
-        output = input.copy()
+    def predict(self, X: np.array) -> np.array:
+        X = np.asarray(X, dtype=np.float64)
+        
         predicted_labels = []
 
-        for _, point in input.iterrows():
-            distances_with_labels = self._get_distances_with_labels(point)
+        for x in X:
+            sorted_labels = self._get_distances_with_labels(x)
 
-            k_neighbors = distances_with_labels[0 : self._k]
+            k_neighbors = sorted_labels[:self._k]
 
             #Escolhe o primero rótulo por ser a dos pontos mais próximos
-            majority = Counter(k_neighbors[label].to_numpy()).most_common(1)[0][0]  
-            predicted_labels.append(majority)
+            label, first_pos, count = np.unique(k_neighbors, return_index=True, return_counts=True)
+            candidates = count == count.max()
+            predicted_labels.append(label[np.argmin(first_pos[candidates])])
 
-        output[label] = predicted_labels
-
-        return output
-
-    def score (self, test_data : pd.DataFrame) -> float:
-        y_true = test_data[self._label].to_numpy()
-
-        predictions = self.classify(test_data)
-        y_pred = predictions[self._label].to_numpy()
-
-        accuracy = np.mean(y_true == y_pred)
-        return accuracy
+        return np.array(predicted_labels)

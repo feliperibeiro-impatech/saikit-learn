@@ -37,6 +37,6 @@ class LDA(_BaseDiscriminant):
                 score[k] = x @ cov_inv @ m - 0.5 * m @ cov_inv @ m + np.log(p)
 
             predictions.append(self._classes[np.argmax(score)])
-
+ 
         return np.array(predictions)
 
