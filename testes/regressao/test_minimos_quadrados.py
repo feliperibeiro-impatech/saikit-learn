@@ -74,3 +74,11 @@ def test_without_interception():
     y = X @ coef
     model = OLS(intercepto=False).fit(X, y)
     np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
+
+def test_sum_constant_to_y(data):
+    X, y = data
+    base = OLS().fit(X, y)
+    model = OLS().fit(X, y - 4.0)
+    np.testing.assert_allclose(model.coef_, base.coef_, atol=1e-8)
+    np.testing.assert_allclose(model.intercept_, base.intercept_ - 4.0, atol=1e-8)
+
