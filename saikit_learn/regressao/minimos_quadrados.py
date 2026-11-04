@@ -38,7 +38,7 @@ class OLS:
         beta = np.linalg.solve(X.T @ X, X.T @ y)
 
         self.intercept_ = beta[0] if self.intercepto else 0.0
-        self.coef_ = self.beta[1:]
+        self.coef_ = beta[1:]
         self._fitted = True
         return self
 
