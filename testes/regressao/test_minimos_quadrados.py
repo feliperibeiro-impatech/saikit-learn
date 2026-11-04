@@ -1,26 +1,26 @@
-from saikit_learn.regressao.minimos_quadrados import MQO
+from saikit_learn.regressao.minimos_quadrados import OLS
 import numpy as np
+import pytest
 
-n, p = 100, 1
-x = np.random.random((n, p))
+# Initial setup
+coef = np.array([2.0, -1.0, 0.5])
+intercepto = 4.0
 
-def f(t):
-    return - np.pi * t.ravel() + 1/2
+@pytest.fixture
+def dados():
+    '''Random X (50, 3) and y exact, whithout noise'''
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(50, 3))
+    y = X @ coef + intercepto
+    return X, y
 
-eps = np.random.normal(scale = 0.5, size = n)
-y = f(x) + eps
+@pytest.fixture
+def dados_ruidosos():
+    '''Random  X (1000, 3) and random y'''
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(1000, 3))
+    y = X @ coef + intercepto + rng.normal(scale=0.1, size = 1000)
+    return X, y
 
-# treino
-model = MQO()
-model.train(x, y)
-print(model.beta)
-
-x_n = np.linspace(0, 1, 200).reshape(-1, 1)
-f_hat = model.predict(x_n)
-
-# definir testes...
-
-def teste1():
-    assert 1 == 1
 
 
