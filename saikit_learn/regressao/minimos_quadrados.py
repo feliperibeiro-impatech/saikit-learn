@@ -60,7 +60,7 @@ class OLS:
 
         else:
             raise NotFittedError(
-                f'{self.__name__} was not fitted yet'
+                f'{self.__class__.__name__} was not fitted yet'
             )
 
 
