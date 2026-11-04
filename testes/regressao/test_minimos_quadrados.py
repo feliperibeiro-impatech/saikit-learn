@@ -103,3 +103,8 @@ def test_predict_before_fit(data):
     with pytest.raises(NotFittedError):
         OLS().predict(X)
 
+def test_attibutes_do_not_exist_yet():
+    model = OLS
+    assert not hasattr(model, 'coef')
+    assert not hasattr(model, 'intercept_')
+
