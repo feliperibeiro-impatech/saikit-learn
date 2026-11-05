@@ -2,7 +2,14 @@ from saikit_learn.discriminant_analysis.base import _BaseDiscriminant
 import numpy as np
 
 class LDA(_BaseDiscriminant):
-    def _fit_covariance(self, X, Y):
+    def _fit_covariance(self, X : np.ndarray, Y : np.ndarray) -> None:
+        """Calcula covariância do LDA
+
+        Args:
+            X (np.ndarray): Matriz de atributos
+            Y (np.ndarray): Vetor dos valores
+        """        
+
         n_samples, n_features = X.shape
         n_classes = len(self._classes)
 
@@ -13,7 +20,16 @@ class LDA(_BaseDiscriminant):
 
         self._covariance = scatter / (n_samples - n_classes)
 
-    def predict(self, X):
+    def predict(self, X : np.ndarray) -> np.ndarray:
+        """Estima valores de acordo com a covariância calculada
+
+        Args:
+            X (np.ndarray): Matriz de atributos
+
+        Returns:
+            np.ndarray: Vetor dos valores calculados
+        """   
+             
         if self._covariance is None:
             raise RuntimeError("Chame fit antes de predict.")
 
