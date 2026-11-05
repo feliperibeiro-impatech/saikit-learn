@@ -29,6 +29,17 @@ class MLPRegressor:
         self._rng = np.random.default_rng(random_state)
         self._weights, self._biases, self._n_features = None
 
+    def _init_parameters(self, sizes):
+        self._weights, self._biases = [], [] 
+        for layer in range(len(sizes)-1):
+            n_in, n_out = sizes[layer], sizes[layer + 1]
+
+            # Desvio He para ReLU
+            W = self._rng.normal(0, np.sqrt(2/n_in)), size=(n_in, n_out)   
+            b = np.zeros(n_out)
+            self._weights.append(W)
+            self._biases.append(b)
+            
     def fit(self, X: np.ndarray, y: np.ndarray):
 
         if not isinstance(X, np.ndarray):
@@ -51,6 +62,8 @@ class MLPRegressor:
         y = y.reshape(-1, 1)
 
         size = [self._n_features, *self._hidden, 1]
+        self._init_parameters(size)
+
     def predict(self, X, y):
         pass
     
