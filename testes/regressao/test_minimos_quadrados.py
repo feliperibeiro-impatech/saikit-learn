@@ -3,13 +3,13 @@ from saikit_learn.utilidades.validacao import NotFittedError
 import numpy as np
 import pytest
 
-# Initial setup
-coef = np.array([2.0, -1.0, 0.5])
-interception = 4.0
+# Setup Inicial
+coef = np.array([1.0, -2.0, 0.3])
+interception = 4.5
 
 @pytest.fixture
 def data():
-    '''Random X (50, 3) and y exact, whithout noise'''
+    '''X (50, 3) aleatório e y (50, 1) exato, sem ruído'''
     rng = np.random.default_rng(0)
     X = rng.normal(size=(50, 3))
     y = X @ coef + interception
@@ -17,20 +17,20 @@ def data():
 
 @pytest.fixture
 def noise_data():
-    '''Random  X (1000, 3) and random y'''
+    '''X (100, 3) aleatório e y (100, 1) com ruído'''
     rng = np.random.default_rng(0)
-    X = rng.normal(size=(1000, 3))
-    y = X @ coef + interception + rng.normal(scale=0.1, size = 1000)
+    X = rng.normal(size=(100, 3))
+    y = X @ coef + interception + rng.normal(scale=0.1, size = 100)
     return X, y
 
-# Testes numéricos
+# Testes Numéricos
 def test_recovers_coeficients_without_noise(data):
     X, y = data
     model = OLS().fit(X, y)
     np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
     np.testing.assert_allclose(model.intercept_, interception, atol=1e-8)
 
-def test_normal_equations(noise_data):
+def test_design_matrix(noise_data):
     X, y = noise_data
     A = np.column_stack([np.ones(X.shape[0]), X])
     beta_ref = np.linalg.solve(A.T @ A, A.T @ y)
@@ -48,17 +48,16 @@ def test_orthogonal_residual(noise_data):
 def test_correct_coeficients_with_noise(noise_data):
     X, y = noise_data
     model = OLS().fit(X, y)
-    np.testing.assert_allclose(model.intercept_, interception, atol=.5)
-    np.testing.assert_allclose(model.coef_, coef, atol=.5)
+    np.testing.assert_allclose(model.intercept_, interception, atol=.05)
+    np.testing.assert_allclose(model.coef_, coef, atol=.05)
 
 def test_predict_correctly(data):
     X, y = data
     model = OLS().fit(X, y)
-    rng = np.random.default_rng(1)
+    rng = np.random.default_rng(10)
     X_new = rng.normal(size=(100, 3))
     y_new = X_new @ coef + interception
-    error = y_new - model.predict(X_new)
-    np.testing.assert_allclose(error.sum(), 0.0, atol=1e-8)
+    np.testing.assert_allclose(model.predict(X_new), y_new, atol=1e-8)
 
 def test_predict_correctly_with_noise(noise_data):
     X, y = noise_data
@@ -66,8 +65,7 @@ def test_predict_correctly_with_noise(noise_data):
     rng = np.random.default_rng(1)
     X_new = rng.normal(size=(1000, 3))
     y_new = X_new @ coef + interception + rng.normal(scale=0.1, size = 1000)
-    error = y_new - model.predict(X_new)
-    np.testing.assert_allclose(error.sum() / 1000, 0.0, atol=1e-2)
+    np.testing.assert_allclose(model.predict(X_new), y_new, atol=.5)
 
 def test_without_interception():
     rng = np.random.default_rng(1)
@@ -83,12 +81,6 @@ def test_sum_constant_to_y(data):
     np.testing.assert_allclose(model.coef_, base.coef_, atol=1e-8)
     np.testing.assert_allclose(model.intercept_, base.intercept_ - 4.0, atol=1e-8)
 
-def test_colinear_columns(data):
-    X, y = data
-    X_rd = np.column_stack([X, X[:, 0]])
-    model = OLS().fit(X_rd, y)
-    np.testing.assert_allclose(model.predict(X_rd), y, atol=1e-8)
-
 def test_more_features_than_sample():
     rng = np.random.default_rng(1)
     X = rng.normal(size=(5, 10))
@@ -96,16 +88,29 @@ def test_more_features_than_sample():
     model = OLS().fit(X, y)
     np.testing.assert_allclose(model.predict(X), y, atol=1e-8)
 
-# Testes de erros
+# Teste de Erros
+def test_colinear_columns(data):
+    X, y = data
+    X_rd = np.column_stack([X, X[:, 0]])
+    with pytest.raises(np.linalg.LinAlgError):
+        OLS().fit(X_rd, y)
 
 def test_predict_before_fit(data):
     X, y = data
     with pytest.raises(NotFittedError):
         OLS().predict(X)
 
+def test_wrong_dimension_predict(data):
+    rng = np.random.default_rng(1)
+    X, y = data
+    model = OLS().fit(X, y)
+    with pytest.raises(ValueError):
+        model.predict(rng.normal(size=(10, 5)))
+
+
 def test_attibutes_do_not_exist_yet():
-    model = OLS
-    assert not hasattr(model, 'coef')
+    model = OLS()
+    assert not hasattr(model, 'coef_')
     assert not hasattr(model, 'intercept_')
 
 @pytest.mark.parametrize(
@@ -134,3 +139,5 @@ def test_ideal_shape(data):
     X, y = data
     model = OLS().fit(X, y)
     assert model.predict(X).shape == (50,)
+
+# testar predict com um número de features diferente do fit: valueerror
