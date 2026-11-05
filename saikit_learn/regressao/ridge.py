@@ -35,7 +35,7 @@ class Ridge:
         else:
             Xprime, yprime = X, y
 
-        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(n_features), Xprime.T @ yprime)
+        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(self.n_features), Xprime.T @ yprime)
         self.intercept_ = float(y_mean - X_mean @ self.coef_) if self.intercepto else 0.0
         self._fitted = True
         return self
