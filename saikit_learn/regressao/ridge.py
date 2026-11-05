@@ -8,11 +8,20 @@ class Ridge:
         self._fitted = False
 
     def fit(self, X:np.ndarray, y:np.ndarray):
-        if not np.isfinite(self.lmbd) or self.lmbd < 0:
-            raise ValueError
+        try:
+            lmbd = float(self.lmbd)
+
+        except (TypeError, ValueError):
+            raise ValueError(
+                f'lambda deve ser um número; dado: {type(self.lmbd)}'
+            )
+
+        if not np.isfinite(lmbd) or lmbd < 0:
+            raise ValueError(
+                f'Lambda deve ser um número real não negativo; dado: {self.lmbd}'
+            )
 
         X, y = verify_X_y(X, y)
-        d = X.shape[1]
         self.n_features_in_ = X.shape[1]
 
         if self.intercepto:
@@ -26,7 +35,7 @@ class Ridge:
         else:
             Xprime, yprime = X, y
 
-        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(d), Xprime.T @ yprime)
+        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(n_features), Xprime.T @ yprime)
         self.intercept_ = float(y_mean - X_mean @ self.coef_) if self.intercepto else 0.0
         self._fitted = True
         return self
@@ -35,11 +44,11 @@ class Ridge:
         X = verify_array(X)
 
         if not self._fitted:
-            raise NotFittedError(f'{self.__class__.__name__} was not fitted yet')
+            raise NotFittedError(f'{self.__class__.__name__} não foi fittado ainda')
 
         if self.n_features_in_ != X.shape[1]:
             raise ValueError(
-                f'Features dimension mismatch\nrequired: {self.n_features_in_}\ngiven: {X.shape[1]}'
+                f'A dimensão das features está incorreta\nnecessária: {self.n_features_in_}\ndado: {X.shape[1]}'
             )
-
+        
         return X @ self.coef_ + self.intercept_
