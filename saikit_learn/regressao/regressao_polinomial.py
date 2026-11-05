@@ -1,0 +1,30 @@
+from saikit_learn.utilidades.validacao import verify_array, verify_X_y, NotFittedError
+from saikit_learn.regressao.minimos_quadrados import OLS
+import numpy as np
+
+class PolReg:
+    def __init__(self, d : int, intercepto: bool = True):
+        self.d = d
+        self.intercepto = intercepto
+        self._fitted = False
+
+    def _desing(self, X : np.ndarray):
+        return np.hstack([X ** k for k in range(1, self.d + 1)])
+
+    def fit(self, X : np.ndarray, y : np.ndarray):
+        if not isinstance(self.d, (int, np.integer)) or self.d < 1:
+            raise ValueError
+        
+        X, y = verify_X_y(X, y)
+
+        if X.shape[1] != 1:
+            raise ValueError
+
+        self.n_features_in_ = X.shape[1]
+        self.model_ = OLS(intercepto=self.intercepto).fit(self._design(X), y)
+        self._fitted = True
+        return self
+
+    def predict(self, X : np.ndarray):
+        X = verify_array(X)
+        return self.model_.predict(X)
