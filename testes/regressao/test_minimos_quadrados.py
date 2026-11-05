@@ -139,5 +139,3 @@ def test_ideal_shape(data):
     X, y = data
     model = OLS().fit(X, y)
     assert model.predict(X).shape == (50,)
-
-# testar predict com um número de features diferente do fit: valueerror
