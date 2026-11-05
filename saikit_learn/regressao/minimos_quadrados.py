@@ -1,49 +1,59 @@
-from saikit_learn.utilidades.validacao import verify_X_y, NotFittedError
+from saikit_learn.utilidades.validacao import verify_array, verify_X_y, NotFittedError
 import numpy as np
 
-class OLS:
-    '''Linear regression by ordinary least squares
-
-    Parameters:
-        intercepto: bool, default=True
-
-    Attributes:
-        coef_ : np.ndarray shape (n_features)
-        intercept_ : float
-        _fitted : bool
-    '''
+class OLS:    
     def __init__(self, intercepto:bool = True):
         self.intercepto = intercepto
         self._fitted = False
 
     def _design(self, x:np.ndarray) -> np.ndarray:
+        """_summary_
+
+        Args:
+            x (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: _description_
+        """        
         if self.intercepto:
             X = np.column_stack([np.ones(x.shape[0]), x])
             return X
         return x
 
     def fit(self, x:np.ndarray, y:np.ndarray):
-        '''Train the model.
-        Parameters:
-            X : np.ndarray shape (n_sample, n_features)
-            y = np.ndarray shape (n_sample)
+        """_summary_
+
+        Args:
+            x (np.ndarray): _description_
+            y (np.ndarray): _description_
 
         Returns:
-            self : OLS
-        
-        '''
+            _type_: _description_
+        """           
         X, y =  verify_X_y(x, y)
+        self.n_features_in_ = X.shape[1]
         X = self._design(X)
 
-        beta = np.linalg.lstsq(X, y, rcond=None)[0]
+        beta = np.linalg.solve(X.T @ X, X.T @ y)
 
-        self.intercept_ = beta[0] if self.intercepto else 0.0
+        self.intercept_ = float(beta[0]) if self.intercepto else 0.0
         self.coef_ = beta[1:] if self.intercepto else beta
         self._fitted = True
         return self
 
     def predict(self, X:np.ndarray) -> np.ndarray:
-        '''Predict y for new sample.
+        """_summary_
+
+        Args:
+            X (np.ndarray): _description_
+
+        Raises:
+            ValueError: _description_
+            NotFittedError: _description_
+
+        Returns:
+            np.ndarray: _description_
+        """        '''Predict y for new sample.
 
         Parameters:
             X : np.ndarray shape (n_sample, n_features)
@@ -55,8 +65,15 @@ class OLS:
             NotFittedError
 
         '''
+        X = verify_array(X)
+
         if self._fitted:
-            return X @ self.coef_ + self.intercept_
+            if self.n_features_in_ == X.shape[1]:
+                return X @ self.coef_ + self.intercept_
+            else:
+                raise ValueError(
+                    f'Features dimension mismatch\nrequired: {self.n_features_in_}\ngiven: {X.shape[1]}'
+                )
 
         else:
             raise NotFittedError(
