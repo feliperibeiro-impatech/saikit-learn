@@ -67,17 +67,14 @@ class OLS:
         '''
         X = verify_array(X)
 
-        if self._fitted:
-            if self.n_features_in_ == X.shape[1]:
-                return X @ self.coef_ + self.intercept_
-            else:
-                raise ValueError(
-                    f'Features dimension mismatch\nrequired: {self.n_features_in_}\ngiven: {X.shape[1]}'
-                )
-
-        else:
+        if not self._fitted:
             raise NotFittedError(
                 f'{self.__class__.__name__} was not fitted yet'
-            )
-
+                )
+        
+        if self.n_features_in_ != X.shape[1]:
+            raise ValueError(
+                f'Features dimension mismatch\nrequired: {self.n_features_in_}\ngiven: {X.shape[1]}'
+                             )
+        return X @ self.coef_ + self.intercept_
 
