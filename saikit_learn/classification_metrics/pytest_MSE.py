@@ -51,7 +51,7 @@ def test_MSE_4_decimal_case():
 def test_MSE_5_large_numbers_case():
     """
     Test the MSE function with large numbers.
-    The MSE should be 1e10
+    The MSE should be 6400.0, which is the square of the difference (80) between the true and predicted values.
     """
     y_true = np.array([1e10, 2e10, 3e10])
     y_pred = np.array([1e10 + 80, 2e10 + 80, 3e10 + 80])
