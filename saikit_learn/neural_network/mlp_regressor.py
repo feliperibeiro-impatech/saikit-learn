@@ -40,6 +40,23 @@ class MLPRegressor:
             self._weights.append(W)
             self._biases.append(b)
 
+    def _forward(self, X: np.ndarray) ->  tuple[np.ndarray, np.ndarray]:
+        activations, zs = [X], []
+        n_layers = len(self._weights)
+
+        for l in range(n_layers):
+            z = activations[-1] @ self._weights[l] + self._biases[l]
+            zs.append(z)
+
+            if l < n_layers- 1:
+                a = np.maximum(0, z)
+            else:
+                a = z
+
+            activations.append(a)
+
+        return activations, zs
+
     def fit(self, X: np.ndarray, y: np.ndarray):
 
         if not isinstance(X, np.ndarray):
@@ -63,6 +80,19 @@ class MLPRegressor:
 
         size = [self._n_features, *self._hidden, 1]
         self._init_parameters(size)
+
+        self._loss_history = []
+        for epoch in range(self._n_epochs):
+            activations, zs = self._foward(X)
+            y_pred = activations[-1]
+
+            loss = np.mean((y_pred - y)**2) / 2
+
+            if not np.isfinite(loss):
+                raise FloatingPointError("A perda divergiu; reduza learning_rate ou padronize X.")
+            self._loss_history.append(loss)
+
+            ## FALTA BACWARD
 
     def predict(self, X, y):
         pass

@@ -66,3 +66,36 @@ def test_init_parameters_escala_he():
     modelo = MLPRegressor(random_state=0)
     modelo._init_parameters([500, 500, 1])
     assert np.isclose(modelo._weights[0].std(), np.sqrt(2 / 500), rtol=0.05)
+
+
+# _forward
+
+# Testa a saída sem camada oculta, onde y = 2*x1 + 3*x2 + 1.
+def test_forward_linear_conferido_a_mao():
+    modelo = MLPRegressor(hidden_layers=())
+    modelo._weights = [np.array([[2.0], [3.0]])]
+    modelo._biases = [np.array([1.0])]
+    activations, zs = modelo._forward(np.array([[1.0, 1.0], [0.0, 2.0]]))
+    assert np.allclose(activations[-1], [[6.0], [7.0]])
+
+
+# Testa que a ReLU zera valores negativos na camada oculta e que a saída não aplica ativação.
+def test_forward_relu_na_oculta_e_identidade_na_saida():
+    modelo = MLPRegressor(hidden_layers=(2,))
+    modelo._weights = [np.array([[1.0, -1.0]]), np.array([[1.0], [1.0]])]
+    modelo._biases = [np.zeros(2), np.array([-5.0])]
+    activations, zs = modelo._forward(np.array([[2.0]]))
+    assert np.allclose(activations[1], [[2.0, 0.0]])
+    assert np.allclose(activations[-1], [[-3.0]])
+
+
+# Testa que activations tem L+1 elementos (começando em X) e zs tem L.
+def test_forward_tamanhos_das_listas():
+    modelo = MLPRegressor(hidden_layers=(4, 3), random_state=0)
+    modelo._init_parameters([2, 4, 3, 1])
+    X = np.ones((5, 2))
+    activations, zs = modelo._forward(X)
+    assert len(activations) == 4 and len(zs) == 3
+    assert np.array_equal(activations[0], X)
+    assert [a.shape for a in activations] == [(5, 2), (5, 4), (5, 3), (5, 1)]
+
