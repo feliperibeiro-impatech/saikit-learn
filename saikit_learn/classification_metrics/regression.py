@@ -9,8 +9,9 @@ from numpy.typing import NDArray
 #PRECISO GARANTIR ALGUMAS VALIDAÇÕES DE ENTRADA, COMO MESMO TAMANHO, NÃO VAZIO E ETC!!! ACHO QUE ESSAS
 #VALIDAÇÕES DEVEM SE REPETIR PARA AS DEMAIS MÉTRICAS... TALVEZ SEJA INTERESSANTE SEGMENTAR ESSES TESTES 
 
+#Avaliar com grupo se coloca o nome completo das metricas ou se deixa abreviado assim 
 
-def MSE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float: #DAVI
+def MSE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float:
     """
     Calculate the Mean Squared Error (MSE) between true and predicted values.
 
@@ -25,10 +26,9 @@ def MSE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float: #DAV
     squared_errors = (y_true - y_pred) ** 2
     return float(np.mean(squared_errors))
 
+def RMSE(y_true, y_pred):
 
-
-def RMSE(): #DAVI
-    pass
+    return np.sqrt(MSE(y_true, y_pred))
 
 def MAE(): #DAVI
     pass
