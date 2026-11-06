@@ -13,12 +13,12 @@ class Ridge:
 
         except (TypeError, ValueError):
             raise ValueError(
-                f'lambda deve ser um número; dado: {type(self.lmbd)}'
+                f'lambda deve ser um número; obtido: {type(self.lmbd)}'
             )
 
         if not np.isfinite(lmbd) or lmbd < 0:
             raise ValueError(
-                f'Lambda deve ser um número real não negativo; dado: {self.lmbd}'
+                f'lambda deve ser um número real não negativo; obtido: {self.lmbd}'
             )
 
         X, y = verify_X_y(X, y)
@@ -44,11 +44,11 @@ class Ridge:
         X = verify_array(X)
 
         if not self._fitted:
-            raise NotFittedError(f'{self.__class__.__name__} não foi fittado ainda')
+            raise NotFittedError(f'{self.__class__.__name__} não foi fittada ainda')
 
         if self.n_features_in_ != X.shape[1]:
             raise ValueError(
-                f'A dimensão das features está incorreta\nnecessária: {self.n_features_in_}\ndado: {X.shape[1]}'
+                f'a dimensão das features está incorreta; necessário: {self.n_features_in_}; obtido: {X.shape[1]}'
             )
         
         return X @ self.coef_ + self.intercept_

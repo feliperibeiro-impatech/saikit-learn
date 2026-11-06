@@ -13,18 +13,26 @@ class PolReg:
 
     def fit(self, X : np.ndarray, y : np.ndarray):
         if not isinstance(self.d, (int, np.integer)) or self.d < 1:
-            raise ValueError
+            raise ValueError(
+                f'd deve ser um número inteiro positivo; obtido: {self.d}'
+            )
         
         X, y = verify_X_y(X, y)
+        self.n_features_in_ = X.shape[1]
 
         if X.shape[1] != 1:
-            raise ValueError
+            raise ValueError(
+                f'a dimensão das features está incorreta; necessário: 1; obtido: {self.n_features_in_}'
+            )
 
-        self.n_features_in_ = X.shape[1]
         self.model_ = OLS(intercepto=self.intercepto).fit(self._design(X), y)
         self._fitted = True
         return self
 
     def predict(self, X : np.ndarray):
+        if not self._fitted:
+            raise NotFittedError(
+                f'{self.__class__.__name__} não foi fittado ainda'
+                )
         X = verify_array(X)
         return self.model_.predict(X)
