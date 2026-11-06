@@ -14,6 +14,7 @@ Avaliar com grupo se coloca o nome completo das metricas ou se deixa abreviado a
 
 """
 
+
 def MSE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float:
     """
     Calculate the Mean Squared Error (MSE) between true and predicted values.
@@ -42,8 +43,20 @@ def RMSE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float:
     """
     return np.sqrt(MSE(y_true, y_pred))
 
-def MAE(): #DAVI
-    pass
+def MAE(y_true: NDArray[np.float64], y_pred: NDArray[np.float64]) -> float:
+    """
+    Calculate the Mean Absolute Error (MAE) between true and predicted values.
+
+    Parameters:
+    y_true (NDArray[np.float64]): The true values.
+    y_pred (NDArray[np.float64]): The predicted values.
+
+    Returns:
+    float: The Mean Absolute Error.
+    """
+    absolute_errors = np.abs(y_true - y_pred)
+    return float(np.mean(absolute_errors))
+#### PRECISA TESTAR FUNCIONAMENTO E PYTEST!! 
 
 def RSS(): #DAVI
     pass
