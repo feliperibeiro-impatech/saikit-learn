@@ -5,10 +5,10 @@ class QDA(_BaseDiscriminant):
     def __init__(self, reg_param : float = 0.0):
         """Inicializa o QDA
 
-            Args:
-                reg_param (float): Valor somado à diagonal de cada matriz de covariância
-                    para evitar matrizes singulares. Deve ser maior ou igual a 0.
-                    Com 0.0 não aplica regularização.
+        Args:
+            reg_param (float): Valor somado à diagonal de cada matriz de covariância
+                para evitar matrizes singulares. Deve ser maior ou igual a 0.
+                Com 0.0 não aplica regularização.
         """
         super().__init__()
 
