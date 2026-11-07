@@ -99,3 +99,47 @@ def test_forward_tamanhos_das_listas():
     assert np.array_equal(activations[0], X)
     assert [a.shape for a in activations] == [(5, 2), (5, 4), (5, 3), (5, 1)]
 
+# _backward
+
+# Testa que os gradientes têm os mesmos shapes dos pesos e vieses.
+def test_backward_shapes():
+    modelo = MLPRegressor(hidden_layers=(4, 3), random_state=0)
+    modelo._init_parameters([2, 4, 3, 1])
+    X, Y = np.random.default_rng(0).normal(size=(6, 2)), np.ones((6, 1))
+    activations, zs = modelo._forward(X)
+    gW, gb = modelo._backward(Y, activations, zs)
+    assert [g.shape for g in gW] == [W.shape for W in modelo._weights]
+    assert [g.shape for g in gb] == [b.shape for b in modelo._biases]
+
+# Calcula a perda (1/2n) * soma((y_pred - y)^2) usando o próprio _forward do modelo.
+def perda(modelo, X, Y):
+    activations, _ = modelo._forward(X)
+    return np.mean((activations[-1] - Y.reshape(-1, 1)) ** 2) / 2
+
+# Testa cada gradiente analítico contra a diferença finita centrada (L(t+e) - L(t-e)) / 2e.
+@pytest.mark.parametrize("seed", range(10))
+@pytest.mark.parametrize("hidden", [(), (5,), (4, 3)])
+def test_backward_gradiente_numerico(hidden, seed):
+    rng = np.random.default_rng(seed)
+    X, Y = rng.normal(size=(7, 3)), rng.normal(size=7)
+    modelo = MLPRegressor(hidden_layers=hidden, random_state=seed)
+    modelo._init_parameters([3, *hidden, 1])
+    modelo._biases = [rng.normal(0, 0.5, size=b.shape) for b in modelo._biases]
+
+    activations, zs = modelo._forward(X)
+    if any(np.abs(z).min() < 1e-3 for z in zs[:-1]):
+        pytest.skip("algum z da ReLU está perto de 0")
+    gW, gb = modelo._backward(Y.reshape(-1, 1), activations, zs)
+
+    eps = 1e-5
+    for params, grads in ((modelo._weights, gW), (modelo._biases, gb)):
+        for p, g in zip(params, grads):
+            for idx in np.ndindex(p.shape):
+                original = p[idx]
+                p[idx] = original + eps
+                mais = perda(modelo, X, Y)
+                p[idx] = original - eps
+                menos = perda(modelo, X, Y)
+                p[idx] = original
+                numerico = (mais - menos) / (2 * eps)
+                assert np.isclose(g[idx], numerico, rtol=1e-4, atol=1e-7)

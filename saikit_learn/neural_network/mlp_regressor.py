@@ -6,9 +6,9 @@ class MLPRegressor:
 
         Args:
             hidden_layers (tuple, opcional): Tamanhos das camadas ocultas. Padrão é (10,).
-            learning_rate (float, optional): Passo do gradiente descende. Padrão é 0.01.
-            n_epochs (int, optional): Vezes que o conjunto de treino é percorrido. Padrão é 1000.
-            random_state (int, optional): Seed geradora dos pesos inciais. Padrão é None.
+            learning_rate (float, opcional): Passo do gradiente descende. Padrão é 0.01.
+            n_epochs (int, opcional): Vezes que o conjunto de treino é percorrido. Padrão é 1000.
+            random_state (int, opcional): Seed geradora dos pesos inciais. Padrão é None.
         """
         
         if not isinstance(hidden_layers, (tuple, list)):
@@ -29,7 +29,12 @@ class MLPRegressor:
         self._rng = np.random.default_rng(random_state)
         self._weights, self._biases, self._n_features = None, None, None
 
-    def _init_parameters(self, sizes):
+    def _init_parameters(self, sizes: list):
+        """Inicializa os pesos e vieses de cada camada.
+
+        Args:
+            sizes (list): Matriz com o tamanho das camadas de entrada, oculta e de saída.
+        """        
         self._weights, self._biases = [], [] 
         for layer in range(len(sizes)-1):
             n_in, n_out = sizes[layer], sizes[layer + 1]
@@ -41,6 +46,15 @@ class MLPRegressor:
             self._biases.append(b)
 
     def _forward(self, X: np.ndarray) ->  tuple[np.ndarray, np.ndarray]:
+        """Propaga o X pela rede neural. 
+
+        Args:
+            X (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: Lista com L+1 arrays; activations[0] é X e activations[-1] é a saída (n, 1).
+            np.ndarray: Lista com L arrays com os valores antes da ativação de cada camada.
+        """        
         activations, zs = [X], []
         n_layers = len(self._weights)
 
@@ -57,8 +71,41 @@ class MLPRegressor:
 
         return activations, zs
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def _backward(self, y: np.ndarray, activations: np.ndarray, z: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """Calcula os gradientes da perda em relação a pesos e vieses.
 
+        Args:
+            y (np.ndarray): _description_
+            activations (np.ndarray): _description_
+            z (np.ndarray): _description_
+
+        Returns:
+            np.ndarray:Gradientes dos pesos, com os mesmos tamanhos de self._weights.
+            np.ndarray: Gradientes dos vieses, com os mesmos tamanhos de self._biases.
+        """
+        n_samples = y.shape[0]    
+        n_layers = len(self._weights)
+
+        y_pred = activations[-1]
+        delta = (y_pred-y) / n_samples
+        grads_W, grads_b = [None] * n_layers, [None] * n_layers
+
+        for l in reversed(range(n_layers)):
+            grads_W[l] = activations[l].T @ delta
+            grads_b[l] = np.sum(delta, axis=0)
+            if l > 0: 
+                reLU_deriv = (z[l - 1] > 0)
+                delta = delta @ self._weights[l].T * reLU_deriv
+
+        return grads_W, grads_b
+
+    def fit(self, X: np.ndarray, y: np.ndarray):
+        """Treina o regressor MLP por gradiente descendente.
+
+        Args:
+            X (np.ndarray): Atributos de treino.
+            y (np.ndarray): Valores-alvo contínuos.
+        """      
         if not isinstance(X, np.ndarray):
             raise TypeError(f"X deve ser np.ndarray, recebeu {type(X).__name__}")
         if not isinstance(y, np.ndarray):
@@ -83,7 +130,7 @@ class MLPRegressor:
 
         self._loss_history = []
         for epoch in range(self._n_epochs):
-            activations, zs = self._foward(X)
+            activations, zs = self._forward(X)
             y_pred = activations[-1]
 
             loss = np.mean((y_pred - y)**2) / 2
@@ -92,9 +139,15 @@ class MLPRegressor:
                 raise FloatingPointError("A perda divergiu; reduza learning_rate ou padronize X.")
             self._loss_history.append(loss)
 
-            ## FALTA BACWARD
+            grads_W, grads_b = self._backward(y, activations, zs)
 
-    def predict(self, X, y):
+            for l in range(len(self._weights)):
+                self._weights[l] -= self._lr * grads_W[l]
+                self._biases[l] -= self._lr * grads_b[l]
+
+        return self
+
+    def predict(self, X: np.ndarray) ->  np.ndarray:
         pass
     
     
