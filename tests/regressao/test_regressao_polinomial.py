@@ -53,3 +53,22 @@ def test_degree_one_equals_ols(noise_data):
     model_ols = OLS().fit(X, y)
     np.testing.assert_allclose(model_pol.predict(X), model_ols.predict(X), atol = 1e-8)
 
+
+@pytest.mark.parametrize(
+    'd',
+    [
+        1,
+        3,
+        5,
+        10,
+        15
+    ]
+)
+def test_design_matrix_is_correct(noise_data, d):
+    X, y = noise_data
+    design = np.hstack([X ** k for k in range(1, d+1)])
+    model_ols = OLS().fit(design, y)
+    model_pol = PolReg(d).fit(X, y)
+    np.testing.assert_allclose(model_pol.predict(X), model_ols.predict(design), atol = 1e-8)
+
+
