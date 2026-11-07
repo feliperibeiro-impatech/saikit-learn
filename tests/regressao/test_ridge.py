@@ -29,3 +29,25 @@ def test_recovers_coeficients_without_noise_OLS(data):
     model = Ridge(lmbd=0).fit(X, y)
     np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
     np.testing.assert_allclose(model.intercept_, interception, atol=1e-8)
+
+
+# Teste de Erros
+@pytest.mark.parametrize(
+    'lmbd',
+    [
+        np.nan,
+        np.inf,
+        'str',
+        [],
+        {1 : 2},
+        set(),
+        -1,
+        True
+    ]
+)
+
+def test_invalid_lambda(data, lmbd):
+    X, y = data 
+    model = Ridge().fit(X, y)
+    with pytest.raises(ValueError):
+        Ridge(lmbd).fit(X, y)
