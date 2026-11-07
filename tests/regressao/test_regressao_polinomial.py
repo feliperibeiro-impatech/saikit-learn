@@ -34,4 +34,8 @@ def test_recovers_noise_poly_coef(noise_data):
     X_new = np.linspace(-10, 10, 100)[:, None]
     np.testing.assert_allclose(model.predict(X_new), pol(X_new[:, 0]), atol = 0.5)
 
-
+def text_recover_exact_poly_without_coef(data):
+    X, y = data
+    model = PolReg(d=3, intercepto=False).fit(X, y)
+    X_new = np.linspace(-10, 10, 100)[:, None]
+    np.testing.assert_allclose(model.predict(X_new) + 1.2, pol(X_new[:, 0]), atol = 1e-8)
