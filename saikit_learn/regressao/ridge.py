@@ -8,6 +8,11 @@ class Ridge:
         self._fitted = False
 
     def fit(self, X:np.ndarray, y:np.ndarray):
+        if isinstance(self.lmbd, bool):
+            raise ValueError(
+                f'lambda deve ser um número; obtido: {type(self.lmbd)}'
+            )
+
         try:
             lmbd = float(self.lmbd)
 
@@ -16,7 +21,7 @@ class Ridge:
                 f'lambda deve ser um número; obtido: {type(self.lmbd)}'
             )
 
-        if not np.isfinite(lmbd) or lmbd < 0:
+        if not np.isfinite(lmbd) or isinstance(lmbd, bool) or lmbd < 0:
             raise ValueError(
                 f'lambda deve ser um número real não negativo; obtido: {self.lmbd}'
             )
@@ -35,7 +40,7 @@ class Ridge:
         else:
             Xprime, yprime = X, y
 
-        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(self.n_features), Xprime.T @ yprime)
+        self.coef_ = np.linalg.solve(Xprime.T @ Xprime + self.lmbd * np.eye(self.n_features_in_), Xprime.T @ yprime)
         self.intercept_ = float(y_mean - X_mean @ self.coef_) if self.intercepto else 0.0
         self._fitted = True
         return self
@@ -50,5 +55,5 @@ class Ridge:
             raise ValueError(
                 f'a dimensão das features está incorreta; necessário: {self.n_features_in_}; obtido: {X.shape[1]}'
             )
-        
+
         return X @ self.coef_ + self.intercept_
