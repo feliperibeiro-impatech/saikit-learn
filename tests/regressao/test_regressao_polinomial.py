@@ -1,4 +1,4 @@
-from saikit_learn.regressao import PolReg
+from saikit_learn.regressao import PolReg, OLS
 from saikit_learn.utilidades.validacao import NotFittedError
 import numpy as np
 import pytest
@@ -32,7 +32,6 @@ def test_recovers_exact_poly(data):
 def test_recovers_exact_poly_coef(data):
     X, y = data
     model = PolReg(d=3).fit(X, y)
-    X_new = np.linspace(-10, 10, 100)[:, None]
     np.testing.assert_allclose(model.model_.coef_, [3.4, -7.34, 0.3], atol = 1e-8)
     np.testing.assert_allclose(model.model_.intercept_, 1.2, atol = 1e-8)
 
@@ -47,3 +46,10 @@ def text_recover_exact_poly_without_coef(data):
     model = PolReg(d=3, intercepto=False).fit(X, y)
     X_new = np.linspace(-10, 10, 100)[:, None]
     np.testing.assert_allclose(model.predict(X_new) + 1.2, pol(X_new[:, 0]), atol = 1e-8)
+
+def test_degree_one_equals_ols(noise_data):
+    X, y = noise_data
+    model_pol = PolReg(d=1).fit(X, y)
+    model_ols = OLS().fit(X, y)
+    np.testing.assert_allclose(model_pol.predict(X), model_ols.predict(X), atol = 1e-8)
+
