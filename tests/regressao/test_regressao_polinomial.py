@@ -21,3 +21,17 @@ def noise_data():
     return x, y
 
 # Testes Numéricos
+def test_recovers_exact_poly_coef(data):
+    X, y = data
+    model = PolReg(d=3).fit(X, y)
+    X_new = np.linspace(-10, 10, 100)[:, None]
+    np.testing.assert_allclose(model.predict(X_new), pol(X_new[:, 0]), atol = 1e-8)
+
+
+def test_recovers_noise_poly_coef(noise_data):
+    X, y = noise_data
+    model = PolReg(d=3).fit(X, y)
+    X_new = np.linspace(-10, 10, 100)[:, None]
+    np.testing.assert_allclose(model.predict(X_new), pol(X_new[:, 0]), atol = 0.5)
+
+
