@@ -23,3 +23,9 @@ def noise_data():
     y = X @ coef + interception + rng.normal(scale=0.1, size = 100)
     return X, y
 
+# Testes Numéricos
+def test_recovers_coeficients_without_noise_OLS(data):
+    X, y = data
+    model = Ridge(lmbd=0).fit(X, y)
+    np.testing.assert_allclose(model.coef_, coef, atol=1e-8)
+    np.testing.assert_allclose(model.intercept_, interception, atol=1e-8)
