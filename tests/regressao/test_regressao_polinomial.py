@@ -9,24 +9,32 @@ def pol(x):
 
 @pytest.fixture
 def data():
+    '''X em [-10, 10] (100, 1) e y exatamente cúbico, sem ruído'''
     rng = np.random.default_rng(0)
-    x = rng.uniform(-10, 10, size = (100, 1))
-    return x, pol(x[:, 0])
+    X = rng.uniform(-10, 10, size = (100, 1))
+    return X, pol(X[:, 0])
 
 @pytest.fixture
 def noise_data():
+    '''X em [-10, 10] (300, 1) e y cúbico com ruído'''
     rng = np.random.default_rng(1)
-    x = rng.uniform(-10, 10, size = (500, 1))
-    y = pol(x[:, 0]) + rng.normal(scale = 0.5, size = 500)
-    return x, y
+    X = rng.uniform(-10, 10, size = (300, 1))
+    y = pol(X[:, 0]) + rng.normal(scale = 0.5, size = 300)
+    return X, y
 
 # Testes Numéricos
-def test_recovers_exact_poly_coef(data):
+def test_recovers_exact_poly(data):
     X, y = data
     model = PolReg(d=3).fit(X, y)
     X_new = np.linspace(-10, 10, 100)[:, None]
     np.testing.assert_allclose(model.predict(X_new), pol(X_new[:, 0]), atol = 1e-8)
 
+def test_recovers_exact_poly_coef(data):
+    X, y = data
+    model = PolReg(d=3).fit(X, y)
+    X_new = np.linspace(-10, 10, 100)[:, None]
+    np.testing.assert_allclose(model.model_.coef_, [3.4, -7.34, 0.3], atol = 1e-8)
+    np.testing.assert_allclose(model.model_.intercept_, 1.2, atol = 1e-8)
 
 def test_recovers_noise_poly_coef(noise_data):
     X, y = noise_data
